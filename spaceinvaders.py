@@ -75,10 +75,11 @@ def draw_bg():
     screen.blit(background,(0,0))
 
 def restart():
-    global gameOver, countdown, health, spaceship
+    global gameOver, countdown, health, spaceship, pauseGame
     gameOver = 0
     countdown = 3
     health = 3
+    pauseGame = False
 
     if len(spaceship_grp) > 0:
         spaceship_grp.empty()
@@ -105,12 +106,14 @@ def draw_text(text, font, text_col, x, y):
 create_aliens()
 
 run = True
+pauseGame = False
+
 while run:
     clock.tick(fps)
     #Draw Background
     draw_bg()
 
-    if countdown == 0:
+    if countdown == 0 and pauseGame == False:
         #Create random alien bullets
         #Record current time
         time_now = pygame.time.get_ticks()
@@ -138,12 +141,9 @@ while run:
         else:
             if gameOver == -1:
                 draw_text("GAME OVER!",font40,white, int(screenWidth / 2 - 100), int(screenHeight / 2 + 50))
-                restart()
             if gameOver == 1:
-                draw_text("YOU WIN!",font40,white, int(screenWidth / 2 - 100), int(screenHeight / 2 + 50))
-                restart()
-
-    
+                draw_text("YOU WIN!",font40,white, int(screenWidth / 2 - 100), int(screenHeight / 2 + 50))        
+  
     if countdown > 0:
         draw_text("GET READY!",font40,white, int(screenWidth / 2 - 110), int(screenHeight / 2 + 50))
         draw_text(str(countdown),font40,white, int(screenWidth / 2 - 10), int(screenHeight / 2 + 100))
@@ -151,6 +151,9 @@ while run:
         if count_timer - last_count > 1000:
             countdown -= 1
             last_count = count_timer
+    
+    if pauseGame == True:
+      draw_text("PAUSE!",font40,white, int(screenWidth / 2 - 110), int(screenHeight / 2 + 50))
     
     #Update Explosion Group
     explosion_grp.update()
@@ -166,6 +169,21 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+
+    #Get Key Pressed
+    #END key = Quits game
+    #P key = Pauses game
+    #U key = Unpauses game
+    #R key = Restarts game
+    key = pygame.key.get_pressed()
+    if key[pygame.K_r]:
+        restart()
+    if key[pygame.K_END]:
+        run = False
+    if key[pygame.K_p]:        
+        pauseGame = True
+    if key[pygame.K_u]:
+        pauseGame = False
     
     pygame.display.update()
 pygame.quit()
